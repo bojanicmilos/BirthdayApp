@@ -2,6 +2,9 @@
 const mongoose = require('mongoose');
 const express = require('express');
 const bodyParser = require('body-parser')
+require('dotenv').config()
+
+const { DBCONNECTION, PORT} = process.env
 
 const app = express();
 
@@ -15,9 +18,9 @@ app.use('/api/items', itemRouter)
 app.use('/api/birthdayevents', birthdayEventRouter)
 
 
-mongoose.connect('mongodb+srv://milos:milos123@cluster0.dtzemef.mongodb.net/birthdaydb?retryWrites=true&w=majority')
+mongoose.connect(DBCONNECTION)
         .then((result) => {
-            app.listen(3000)
+            app.listen(parseInt(PORT))
         })
         .catch((err) => {
             console.log(err)
