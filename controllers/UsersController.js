@@ -76,14 +76,19 @@ exports.addUser = async (req, res) => {
         }
     }
 
-    const user = new User({
-        name: req.body.name,
-        birthDate: req.body.birthDate,
-        wishList: req.body.wishList
-    })
-    const result = await user.save()
+    try {
+        const user = new User({
+            name: req.body.name,
+            birthDate: req.body.birthDate,
+            wishList: req.body.wishList
+        })
+        const result = await user.save()
+        return res.status(201).json(result)
+    }
+    catch(err) {
+        return res.status(400).send('Username already exists !')
+    }
 
-    return res.status(201).json(result)
 }
 
 exports.addItemToWishList = async (req, res) => {

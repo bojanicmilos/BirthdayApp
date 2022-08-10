@@ -11,7 +11,7 @@ const birthdayEventRouter = require('./routes/birthdayEvents')
 
 app.use(bodyParser.json());
 app.use('/api/users', userRouter)
-app.use('/api/posts', itemRouter)
+app.use('/api/items', itemRouter)
 app.use('/api/birthdayevents', birthdayEventRouter)
 
 
