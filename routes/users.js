@@ -5,8 +5,8 @@ const User = require('../models/User');
 const router = express.Router()
 
 router.post('/', usersController.addUser)
-router.get('/', usersController.login)
+router.get('/login', usersController.login)
+router.get('/logout', usersController.logout)
 router.get('/upcomingbirthdays', usersController.getAllUsersWithUpcomingBirthdays)
 
 module.exports = router;
-//asd
