@@ -2,7 +2,8 @@ const moment = require('moment');
 const User = require('../models/User')
 const Item = require('../models/Item')
 const isDate = require('../helpers/isDateCheck')
-const hasDuplicates = require('../helpers/arrayDuplicatesCheck')
+const hasDuplicates = require('../helpers/arrayDuplicatesCheck');
+const getCurrentDate = require('../helpers/getCurrentDate');
 
 exports.login = async (req, res) => {
    
@@ -33,11 +34,11 @@ exports.logout = (req, res) => {
 exports.getAllUsersWithUpcomingBirthdays = async (req, res) => {
     console.log(global.userId)
     User.find().then(results => {
-        results = results.filter(user => moment(user.birthDate).set(`year`, moment().year()) > moment() && user._id.toString() !== global.userId)
+        results = results.filter(user => moment(user.birthDate).set(`year`, moment().year()) >= getCurrentDate() && user._id.toString() !== global.userId)
 
         return res.status(200).json(results)
     }) 
-// '$where': 'this.birthDate.set(`year`, moment().year()) > moment()'
+// '$where': 'this.birthDate.set(`year`, moment().year()) >= getCurrentDate()'
    // return res.status(200).json(results)
 }
 
@@ -82,4 +83,43 @@ exports.addUser = async (req, res) => {
     const result = await user.save()
 
     return res.status(201).json(result)
+}
+
+exports.addItemToWishList = async (req, res) => {
+    let user;
+    let item;
+
+    try {
+         user = await User.findById(global.userId)
+    }
+    catch(err) {
+        return res.status(400).send('Wrong user ID format !')
+    }
+
+    if (!user) {
+        return res.status(404).send('User not found !')
+    }
+
+    try {
+        item = await Item.findById(req.params.itemId)
+    }
+    catch(err) {
+        return res.status(400).send('Wrong item ID format !')
+    }
+
+    if (!item) {
+        return res.status(404).send('Item not found !')
+    }
+
+    const strItemIDs = [...user.wishList.map(item => item.toString()), req.params.itemId]
+
+    user.wishList = [...user.wishList, req.params.itemId]
+
+    if (hasDuplicates(strItemIDs)) {
+        return res.status(400).send('User cannot have same items in his wish list !')
+    }
+
+    user.save().then(result => {
+        return res.status(200).json(result)
+    })
 }
