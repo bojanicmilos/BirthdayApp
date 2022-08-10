@@ -10,31 +10,32 @@ exports.login = async (req, res) => {
     let foundUser;
 
     try {
-         foundUser = await User.findById(req.query.userId)
+         foundUser = await User.findOne({ name: req.query.userName }).exec()
     }
     catch(err) {
-        return res.status(404).send("Invalid ID error")
+        return res.status(404).send("Invalid username error")
     }
+
+    console.log(foundUser)
     
     if (!foundUser) {
         return res.status(404).send("User not found")
     }
     
     else {
-        global.userId = req.query.userId
+        global.userName = req.query.userName
         return res.status(200).send("User logged")
     }
 }
 
 exports.logout = (req, res) => {
-    global.userId = null;
+    global.userName = null;
     return res.status(200).send('Logout')
 }
 
 exports.getAllUsersWithUpcomingBirthdays = async (req, res) => {
-    console.log(global.userId)
     User.find().then(results => {
-        results = results.filter(user => moment(user.birthDate).set(`year`, moment().year()) >= getCurrentDate() && user._id.toString() !== global.userId)
+        results = results.filter(user => moment(user.birthDate).set(`year`, moment().year()) >= getCurrentDate() && user.name !== global.userName)
 
         return res.status(200).json(results)
     }) 
@@ -90,10 +91,10 @@ exports.addItemToWishList = async (req, res) => {
     let item;
 
     try {
-         user = await User.findById(global.userId)
+         user = await User.findOne({ name: global.userName }).exec()
     }
     catch(err) {
-        return res.status(400).send('Wrong user ID format !')
+        return res.status(400).send('Wrong username format !')
     }
 
     if (!user) {

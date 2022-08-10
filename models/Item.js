@@ -8,11 +8,6 @@ const itemSchema = new Schema({
     },
     urlLink: {
         type: String,
-        requred: false
-    },
-    userId: {
-        type: Schema.Types.ObjectId,
-        ref: 'User',
         required: false
     }
 })
