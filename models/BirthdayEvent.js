@@ -19,7 +19,7 @@ const birthdayEventSchema = new Schema({
     },
     totalMoneyAmount: {
         type: Number,
-        required: false
+        required: true
     },
     notes: {
         type: String,

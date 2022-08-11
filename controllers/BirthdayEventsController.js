@@ -2,6 +2,7 @@ const User = require('../models/User')
 const moment = require('moment');
 const getCurrentDate = require('../helpers/getCurrentDate');
 const BirthdayEvent = require('../models/BirthdayEvent');
+const UserPayment = require('../models/UserPayment')
 
 exports.addBirthdayEvent = async (req, res) => {
     let eventCreator;
@@ -49,7 +50,8 @@ exports.addBirthdayEvent = async (req, res) => {
             eventCreator: eventCreator._id.toString(),
             eventDate: moment(birthdayPerson.birthDate).set('year', moment().year()),
             notes: `Birthday for ${birthdayPerson.name}`,
-            isBoughtPresent: false
+            isBoughtPresent: false,
+            totalMoneyAmount: 0
         })
 
         const result = await birthdayEvent.save()
@@ -70,4 +72,72 @@ exports.getCurrentEvents = async (req, res) => {
 
 exports.getAllEvents = (req, res) => {
     BirthdayEvent.find().populate('birthdayPerson').then(events => res.status(200).json(events.filter(event => event.birthdayPerson.name !== global.userName)))
+}
+
+exports.addParticipant = async (req, res) => {
+    let birthdayEvent;
+    let user;
+    try {
+        birthdayEvent = await BirthdayEvent.findById(req.body.birthdayEventId).populate('participants')
+    }
+    catch(err) {
+        return res.status(400).send('Wrong birthday event ID format !')
+    }
+    
+    try {
+        user = await User.findOne({ name: global.userName }).exec()
+    }
+    catch(err) {
+        return res.status(400).send('Wrong username format !')
+    }
+
+    if (!req.body.amount) {
+        return res.status(400).send('You must fill amount field !')
+    }
+
+    if (!req.body.message) {
+        return res.status(400).send('You must fill message field !')
+    }
+
+    if (!user) {
+        return res.status(400).send('User not found !')
+    }
+   
+    if (!birthdayEvent) {
+        return res.status(400).send('Event not found !')
+    }
+
+    if (user._id.toString() === birthdayEvent.birthdayPerson.toString()) {
+        return res.status(400).send('You cant pay for your birthday !')
+    }
+    
+    if (birthdayEvent.isBoughtPresent) {
+        return res.status(400).send('Present is already bought for this birthday event !')
+    }
+
+    if (birthdayEvent.eventDate < getCurrentDate()) {
+        return res.status(400).send('Birthay event is in the past !')
+    }
+
+    for (const participant of birthdayEvent.participants) {
+        if (participant.userId.toString() === user._id.toString()) {
+            return res.status(400).send('You are already participant in this birthday event')
+        }
+    }
+
+    const userPayment = new UserPayment({
+        amount: req.body.amount,
+        message: req.body.message,
+        birthdayEventId: req.body.birthdayEventId,
+        userId: user._id
+    })
+
+    const result = await userPayment.save()
+
+    birthdayEvent.totalMoneyAmount = birthdayEvent.totalMoneyAmount + result.amount
+    birthdayEvent.participants = [...birthdayEvent.participants, result._id]
+
+    const updatedEvent = await birthdayEvent.save()
+
+    return res.status(200).json(updatedEvent)
 }
