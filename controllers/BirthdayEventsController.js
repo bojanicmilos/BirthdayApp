@@ -2,7 +2,9 @@ const User = require('../models/User')
 const moment = require('moment');
 const getCurrentDate = require('../helpers/getCurrentDate');
 const BirthdayEvent = require('../models/BirthdayEvent');
-const UserPayment = require('../models/UserPayment')
+const UserPayment = require('../models/UserPayment');
+const Present = require('../models/Present');
+const Item = require('../models/Item');
 
 exports.addBirthdayEvent = async (req, res) => {
     let eventCreator;
@@ -132,12 +134,61 @@ exports.addParticipant = async (req, res) => {
         userId: user._id
     })
 
-    const result = await userPayment.save()
-
     birthdayEvent.totalMoneyAmount = birthdayEvent.totalMoneyAmount + result.amount
     birthdayEvent.participants = [...birthdayEvent.participants, result._id]
 
-    const updatedEvent = await birthdayEvent.save()
+    const result = await Promise.all([birthdayEvent.save(), userPayment.save()])
 
-    return res.status(200).json(updatedEvent)
+    return res.status(200).json(result[0])
+}
+
+exports.buyPresent = async (req, res) => {
+    const { birthdayEventId, presentToBuyId } = req.body;
+
+    let birthdayEvent;
+    let item;
+
+    try {
+         birthdayEvent = await BirthdayEvent.findById(birthdayEventId)
+                                           .populate('eventCreator')
+                                           .populate('birthdayPerson');
+    }
+    catch(err) {
+        return res.status(400).send('Invalid birthday event ID format !')
+    }
+    
+    if (!birthdayEvent) {
+        return res.status(400).send('Birthday event not found !') 
+    }
+
+    try {
+        item = await Item.findById(presentToBuyId)
+    }
+    catch(err) {
+        return res.status(400).send('Invalid Item ID format !')
+    }
+
+    if (!item) {
+        return res.status(400).send('Item not found !')
+    }
+    
+    if (birthdayEvent.eventCreator.name !== global.userName) {
+        return res.status(400).send('Only event creator can buy a present !')
+    }
+
+    const strWishListIDs = birthdayEvent.birthdayPerson.wishList.map(wish => wish.toString())
+
+    if (!strWishListIDs.includes(presentToBuyId.toString())) {
+        return res.status(400).send('That item is not on wish list !')
+    }
+
+    const present = new Present({
+        birthdayEventId: birthdayEventId,
+        presentBought: presentToBuyId
+    })
+    birthdayEvent.isBoughtPresent = true
+
+    const result = await Promise.all([present.save(), birthdayEvent.save()]);
+    
+    return res.status(200).json(result[0])
 }

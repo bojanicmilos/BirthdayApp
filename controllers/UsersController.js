@@ -60,19 +60,17 @@ exports.addUser = async (req, res) => {
         return res.status(400).send('Wish list has duplicate items.')
     }
 
-    console.log(req.body.wishList)
-
     for (const id of req.body.wishList) {
         try {
             const element = await Item.findById(id) 
 
             if (!element) {
-                return res.status(400).send('Invalid ID')
+                return res.status(400).send('Invalid item ID')
             }
         }
         catch(err) {
-            console.log('Invalid ID format')
-            return res.status(400).send('Invalid ID format')
+            console.log('Invalid item ID format')
+            return res.status(400).send('Invalid item ID format')
         }
     }
 
