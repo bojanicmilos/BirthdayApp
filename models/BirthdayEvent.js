@@ -28,6 +28,10 @@ const birthdayEventSchema = new Schema({
     eventDate: {
         type: Date,
         required: true
+    },
+    isBoughtPresent: {
+        type: Boolean,
+        required: false
     }
 })
 

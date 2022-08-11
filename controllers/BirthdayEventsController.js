@@ -48,7 +48,8 @@ exports.addBirthdayEvent = async (req, res) => {
             birthdayPerson: req.body.birthdayPerson,
             eventCreator: eventCreator._id.toString(),
             eventDate: moment(birthdayPerson.birthDate).set('year', moment().year()),
-            notes: `Birthday for ${birthdayPerson.name}`
+            notes: `Birthday for ${birthdayPerson.name}`,
+            isBoughtPresent: false
         })
 
         const result = await birthdayEvent.save()
@@ -58,5 +59,15 @@ exports.addBirthdayEvent = async (req, res) => {
     catch(err) {
         res.status(400).send('Wrong event data provided !')
     }
-    
+}
+
+exports.getCurrentEvents = async (req, res) => {
+    const currentEvents =  await BirthdayEvent.find({eventDate: { $gte: getCurrentDate()}}).populate('birthdayPerson')
+    const currentEventsWithoutLoggedUser = currentEvents.filter(event => event.birthdayPerson.name !== global.userName)
+
+    return res.status(200).json(currentEventsWithoutLoggedUser)
+}
+
+exports.getAllEvents = (req, res) => {
+    BirthdayEvent.find().populate('birthdayPerson').then(events => res.status(200).json(events.filter(event => event.birthdayPerson.name !== global.userName)))
 }
