@@ -24,7 +24,7 @@ exports.login = async (req, res) => {
     
     else {
         global.userName = req.query.userName
-        return res.status(200).send("User logged")
+        return res.status(200).json(foundUser)
     }
 }
 

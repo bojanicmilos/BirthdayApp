@@ -3,6 +3,6 @@ const birthdayEventsController = require('../controllers/BirthdayEventsControlle
 
 const router = express.Router()
 
-router.post('/', birthdayEventsController.addBirthdayEvent)
+router.post('/add', birthdayEventsController.addBirthdayEvent)
 
 module.exports = router;

@@ -24,6 +24,10 @@ const birthdayEventSchema = new Schema({
     notes: {
         type: String,
         required: false
+    },
+    eventDate: {
+        type: Date,
+        required: true
     }
 })
 
