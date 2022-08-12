@@ -128,18 +128,20 @@ exports.addParticipant = async (req, res) => {
     }
 
     const userPayment = new UserPayment({
-        amount: req.body.amount,
+        amount: +req.body.amount,
         message: req.body.message,
         birthdayEventId: req.body.birthdayEventId,
         userId: user._id
     })
 
+    const result = await userPayment.save()
+
     birthdayEvent.totalMoneyAmount = birthdayEvent.totalMoneyAmount + result.amount
     birthdayEvent.participants = [...birthdayEvent.participants, result._id]
 
-    const result = await Promise.all([birthdayEvent.save(), userPayment.save()])
+    const updatedEvent = await birthdayEvent.save()
 
-    return res.status(200).json(result[0])
+    return res.status(200).json(updatedEvent)
 }
 
 exports.buyPresent = async (req, res) => {
@@ -180,6 +182,10 @@ exports.buyPresent = async (req, res) => {
 
     if (!strWishListIDs.includes(presentToBuyId.toString())) {
         return res.status(400).send('That item is not on wish list !')
+    }
+    
+    if (birthdayEvent.isBoughtPresent) {
+        return res.status(400).send('Present is already bought for this event !')
     }
 
     const present = new Present({
