@@ -4,6 +4,7 @@ const Item = require('../models/Item')
 const isDate = require('../helpers/isDateCheck')
 const hasDuplicates = require('../helpers/arrayDuplicatesCheck');
 const getCurrentDate = require('../helpers/getCurrentDate');
+const giveProperPageAndLimit = require('../helpers/giveProperPageAndLimit')
 
 exports.login = async (req, res) => {
    
@@ -34,10 +35,12 @@ exports.logout = (req, res) => {
 }
 
 exports.getAllUsersWithUpcomingBirthdays = async (req, res) => {
+    const { page, limit } = giveProperPageAndLimit(req.query.page, req.query.limit);
+
     User.find().then(results => {
         results = results.filter(user => moment(user.birthDate).set(`year`, moment().year()) >= getCurrentDate() && user.name !== global.userName)
-
-        return res.status(200).json(results)
+        const paginatedResults = results.slice((page - 1) * limit, page * limit)
+        return res.status(200).json(paginatedResults)
     }) 
 // '$where': 'this.birthDate.set(`year`, moment().year()) >= getCurrentDate()'
    // return res.status(200).json(results)
@@ -77,7 +80,7 @@ exports.addUser = async (req, res) => {
     try {
         const user = new User({
             name: req.body.name,
-            birthDate: req.body.birthDate,
+            birthDate: req.body.birthDate.slice(0, 10),
             wishList: req.body.wishList
         })
         const result = await user.save()

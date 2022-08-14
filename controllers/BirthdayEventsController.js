@@ -5,6 +5,7 @@ const BirthdayEvent = require('../models/BirthdayEvent');
 const UserPayment = require('../models/UserPayment');
 const Present = require('../models/Present');
 const Item = require('../models/Item');
+const giveProperPageAndLimit = require('../helpers/giveProperPageAndLimit');
 
 exports.addBirthdayEvent = async (req, res) => {
     let eventCreator;
@@ -66,14 +67,23 @@ exports.addBirthdayEvent = async (req, res) => {
 }
 
 exports.getCurrentEvents = async (req, res) => {
+    const { page, limit } = giveProperPageAndLimit(req.query.page, req.query.limit);
+
     const currentEvents =  await BirthdayEvent.find({eventDate: { $gte: getCurrentDate()}}).populate('birthdayPerson')
     const currentEventsWithoutLoggedUser = currentEvents.filter(event => event.birthdayPerson.name !== global.userName)
-
-    return res.status(200).json(currentEventsWithoutLoggedUser)
+    const paginatedResults = currentEventsWithoutLoggedUser.slice((page - 1) * limit, page * limit)
+    return res.status(200).json(paginatedResults)
 }
 
 exports.getAllEvents = (req, res) => {
-    BirthdayEvent.find().populate('birthdayPerson').then(events => res.status(200).json(events.filter(event => event.birthdayPerson.name !== global.userName)))
+    const { page, limit } = giveProperPageAndLimit(req.query.page, req.query.limit);
+
+    BirthdayEvent.find().populate('birthdayPerson')
+                 .then(events => {
+                    const eventsWithoutLoggedUser = events.filter(event => event.birthdayPerson.name !== global.userName)
+                    const paginatedResults = eventsWithoutLoggedUser.slice((page - 1) * limit, page * limit)
+                    res.status(200).json(paginatedResults)
+                 })
 }
 
 exports.addParticipant = async (req, res) => {
@@ -148,7 +158,6 @@ exports.buyPresent = async (req, res) => {
     const { birthdayEventId, presentToBuyId } = req.body;
 
     let birthdayEvent;
-    let item;
 
     try {
          birthdayEvent = await BirthdayEvent.findById(birthdayEventId)
@@ -163,13 +172,6 @@ exports.buyPresent = async (req, res) => {
         return res.status(400).send('Birthday event not found !') 
     }
 
-    try {
-        item = await Item.findById(presentToBuyId)
-    }
-    catch(err) {
-        console.log('Invalid item ID')
-    }
-    
     if (birthdayEvent.eventCreator.name !== global.userName) {
         return res.status(400).send('Only event creator can buy a present !')
     }
