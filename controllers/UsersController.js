@@ -16,8 +16,6 @@ exports.login = async (req, res) => {
     catch(err) {
         return res.status(404).send("Invalid username error")
     }
-
-    console.log(foundUser)
     
     if (!foundUser) {
         return res.status(404).send("User not found")
