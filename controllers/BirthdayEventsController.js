@@ -72,7 +72,7 @@ exports.getCurrentEvents = async (req, res) => {
     const currentEvents =  await BirthdayEvent.find({eventDate: { $gte: getCurrentDate()}}).populate('birthdayPerson')
     const currentEventsWithoutLoggedUser = currentEvents.filter(event => event.birthdayPerson.name !== global.userName)
     const paginatedResults = currentEventsWithoutLoggedUser.slice((page - 1) * limit, page * limit)
-    return res.status(200).json(paginatedResults)
+    return res.status(200).json({paginatedResults, totalFound: currentEventsWithoutLoggedUser.length})
 }
 
 exports.getAllEvents = (req, res) => {
@@ -82,7 +82,7 @@ exports.getAllEvents = (req, res) => {
                  .then(events => {
                     const eventsWithoutLoggedUser = events.filter(event => event.birthdayPerson.name !== global.userName)
                     const paginatedResults = eventsWithoutLoggedUser.slice((page - 1) * limit, page * limit)
-                    res.status(200).json(paginatedResults)
+                    res.status(200).json({paginatedResults, totalFound: eventsWithoutLoggedUser.length})
                  })
 }
 

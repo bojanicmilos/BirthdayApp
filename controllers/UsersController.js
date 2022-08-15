@@ -27,7 +27,7 @@ exports.login = async (req, res) => {
     }
 }
 
-exports.logout = (req, res) => {
+exports.logout = async (req, res) => {
     global.userName = null;
     return res.status(200).send('Logout')
 }
@@ -38,7 +38,7 @@ exports.getAllUsersWithUpcomingBirthdays = async (req, res) => {
     User.find().then(results => {
         results = results.filter(user => moment(user.birthDate).set(`year`, moment().year()) >= getCurrentDate() && user.name !== global.userName)
         const paginatedResults = results.slice((page - 1) * limit, page * limit)
-        return res.status(200).json(paginatedResults)
+        return res.status(200).json({paginatedResults, totalFound: results.length})
     }) 
 // '$where': 'this.birthDate.set(`year`, moment().year()) >= getCurrentDate()'
    // return res.status(200).json(results)
