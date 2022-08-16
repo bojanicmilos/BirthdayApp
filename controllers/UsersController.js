@@ -70,7 +70,6 @@ exports.addUser = async (req, res) => {
             }
         }
         catch(err) {
-            console.log('Invalid item ID format')
             return res.status(400).send('Invalid item ID format')
         }
     }
