@@ -75,7 +75,7 @@ exports.getCurrentEvents = async (req, res) => {
     return res.status(200).json({paginatedResults, totalFound: currentEventsWithoutLoggedUser.length})
 }
 
-exports.getAllEvents = (req, res) => {
+exports.getAllEvents = async (req, res) => {
     const { page, limit } = giveProperPageAndLimit(req.query.page, req.query.limit);
 
     BirthdayEvent.find().populate('birthdayPerson')
