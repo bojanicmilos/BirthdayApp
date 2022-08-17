@@ -7,6 +7,7 @@ const router = express.Router()
 
 router.post('/',
             body('name').isString().isLength({ min: 4 }),
+            body('wishList').isArray(),
             validateRequestSchema,
              usersController.addUser)
 router.get('/login', usersController.login)
