@@ -7,7 +7,7 @@ exports.addItem = async (req, res) => {
 
     try {
         const item = new Item({
-            name: req.body.name,
+            name: req.body.name.toLowerCase(),
             urlLink: req.body.urlLink
         })
     

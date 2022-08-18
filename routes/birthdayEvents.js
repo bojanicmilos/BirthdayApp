@@ -14,6 +14,9 @@ router.post('/addparticipant',
              body('birthdayEventId').exists({ checkFalsy: true }),
              validateRequestSchema,
               birthdayEventsController.addParticipant)
-router.post('/buypresent', birthdayEventsController.buyPresent)
+router.post('/buypresent', 
+            body('itemName').optional().isString(), 
+            validateRequestSchema, 
+            birthdayEventsController.buyPresent)
 
 module.exports = router;

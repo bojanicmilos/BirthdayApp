@@ -187,22 +187,23 @@ exports.buyPresent = async (req, res) => {
     const strWishListIDs = birthdayEvent.birthdayPerson.wishList.map(wish => wish.toString())
 
     if (!strWishListIDs.includes(presentToBuyId?.toString())) {
-
+        
         if (!req.body.itemName) {
             return res.status(400).send('You must provide item name if item is not chosen from the wish list !')
         }
-
-        const item = new Item({
-            name: req.body.itemName,
-            urlLink: req.body.urlLink
-        })
+        
+        const item = await Item.findOne({ name: req.body.itemName.toLowerCase() }).exec()
+        
+        if (!item) {
+            return res.status(400).send('Item not found by name !')
+        }
         const present = new Present({
             birthdayEventId: birthdayEventId,
             presentBought: item._id
         })
         birthdayEvent.isBoughtPresent = true
 
-        const result = await Promise.all([present.save(), item.save(), birthdayEvent.save()])
+        const result = await Promise.all([present.save(), birthdayEvent.save()])
 
         return res.status(200).json(result[0])
     }
