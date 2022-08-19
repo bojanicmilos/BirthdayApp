@@ -13,6 +13,6 @@ router.post('/',
 router.get('/login', usersController.login)
 router.get('/logout', usersController.logout)
 router.get('/upcomingbirthdays', usersController.getAllUsersWithUpcomingBirthdays)
-router.get('/additemtowishlist/:itemId', usersController.addItemToWishList)
+router.patch('/additemtowishlist/:itemId', usersController.addItemToWishList)
 
 module.exports = router;
