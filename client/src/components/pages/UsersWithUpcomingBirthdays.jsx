@@ -2,22 +2,23 @@ import React, { useState, useEffect, useCallback } from 'react'
 import { url } from '../../apiInfo/Url'
 import Table from 'react-bootstrap/Table'
 import moment from 'moment'
+import Pagination from '../pagination/Pagination'
 
 const UsersWithUpcomingBirthdays = () => {
 
     const [users, setUsers] = useState([])
-    const [pageNumber, setPageNumber] = useState(1)
+    const [numOfPages, setNumOfPages] = useState(0)
 
-    const getUsersWithFutureBirthdays = useCallback(async () => {
+    const getUsersWithFutureBirthdays = async (pageNumber = 1) => {
         const response = await fetch(`${url}/api/users/upcomingbirthdays?page=${pageNumber}`)
         const json = await response.json()
+        setNumOfPages(json.numOfPages)
         setUsers(json.paginatedResults)
-
-    }, [pageNumber])
+    }
 
     useEffect(() => {
         getUsersWithFutureBirthdays()
-    }, [getUsersWithFutureBirthdays])
+    }, [])
 
     const showUsers = () => {
         return users.map((user) => {
@@ -34,8 +35,8 @@ const UsersWithUpcomingBirthdays = () => {
 
 
     return (
-        <div>
-            <Table striped bordered hover variant='light'>
+        <div className='table-pagination'>
+            <Table style={{ tableLayout: 'fixed' }} striped bordered hover variant='light'>
                 <thead>
                     <tr>
                         <th>Name</th>
@@ -44,6 +45,10 @@ const UsersWithUpcomingBirthdays = () => {
                 </thead>
                 <tbody>{showUsers()}</tbody>
             </Table>
+            <Pagination
+                searchPaginatedData={getUsersWithFutureBirthdays}
+                numOfPages={numOfPages}
+            />
         </div>
     )
 }

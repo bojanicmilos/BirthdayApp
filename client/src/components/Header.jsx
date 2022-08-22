@@ -13,7 +13,7 @@ const Header = () => {
     };
 
     return (
-        <Navbar bg="light" variant="light">
+        <Navbar style={{ height: '6vh' }} bg="light" variant="light">
             <Navbar.Brand as={Link} to="/">
                 Birthday App
             </Navbar.Brand>

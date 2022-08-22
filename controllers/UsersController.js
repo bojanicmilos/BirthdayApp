@@ -7,20 +7,20 @@ const getCurrentDate = require('../helpers/getCurrentDate');
 const giveProperPageAndLimit = require('../helpers/giveProperPageAndLimit')
 
 exports.login = async (req, res) => {
-   
+
     let foundUser;
 
     try {
-         foundUser = await User.findOne({ name: req.query.userName }).exec()
+        foundUser = await User.findOne({ name: req.query.userName }).exec()
     }
-    catch(err) {
+    catch (err) {
         return res.status(404).send("Invalid username error")
     }
-    
+
     if (!foundUser) {
         return res.status(404).send("User not found")
     }
-    
+
     else {
         global.userName = req.query.userName
         return res.status(200).json(foundUser)
@@ -38,10 +38,10 @@ exports.getAllUsersWithUpcomingBirthdays = async (req, res) => {
     User.find().then(results => {
         results = results.filter(user => moment(user.birthDate).set(`year`, moment().year()) >= getCurrentDate() && user.name !== global.userName)
         const paginatedResults = results.slice((page - 1) * limit, page * limit)
-        return res.status(200).json({paginatedResults, totalFound: results.length})
-    }) 
-// '$where': 'this.birthDate.set(`year`, moment().year()) >= getCurrentDate()'
-   // return res.status(200).json(results)
+        return res.status(200).json({ paginatedResults, totalFound: results.length, numOfPages: Math.ceil(results.length / limit) })
+    })
+    // '$where': 'this.birthDate.set(`year`, moment().year()) >= getCurrentDate()'
+    // return res.status(200).json(results)
 }
 
 exports.addUser = async (req, res) => {
@@ -63,13 +63,13 @@ exports.addUser = async (req, res) => {
 
     for (const id of req.body.wishList) {
         try {
-            const element = await Item.findById(id) 
+            const element = await Item.findById(id)
 
             if (!element) {
                 return res.status(400).send('Invalid item ID')
             }
         }
-        catch(err) {
+        catch (err) {
             return res.status(400).send('Invalid item ID format')
         }
     }
@@ -83,7 +83,7 @@ exports.addUser = async (req, res) => {
         const result = await user.save()
         return res.status(201).json(result)
     }
-    catch(err) {
+    catch (err) {
         return res.status(400).send('Username already exists !')
     }
 
@@ -94,9 +94,9 @@ exports.addItemToWishList = async (req, res) => {
     let item;
 
     try {
-         user = await User.findOne({ name: global.userName }).exec()
+        user = await User.findOne({ name: global.userName }).exec()
     }
-    catch(err) {
+    catch (err) {
         return res.status(400).send('Wrong username format !')
     }
 
@@ -107,7 +107,7 @@ exports.addItemToWishList = async (req, res) => {
     try {
         item = await Item.findById(req.params.itemId)
     }
-    catch(err) {
+    catch (err) {
         return res.status(400).send('Wrong item ID format !')
     }
 

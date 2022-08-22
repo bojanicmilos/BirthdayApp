@@ -37,3 +37,17 @@ label {
     font-weight: 600;
     color: rgb(34, 34, 34);
 }
+
+.table-pagination {
+    min-height: 94vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 10px;
+}
