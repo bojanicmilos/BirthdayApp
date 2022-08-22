@@ -1,28 +1,17 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import './App.css';
+import { isLoggedIn } from './components/loginFunctions/loginFunctions';
+import LoginRoutes from './components/routes/LoginRoutes';
+import UserRoutes from './components/routes/UserRoutes';
+import LoginProvider from './components/utils/LoginProvider';
 
 function App() {
-  const [users, setUsers] = useState([])
-  useEffect(() => {
-    test()
-  }, [])
-
-  const test = async () => {
-    const response = await fetch('http://localhost:3000/api/users/upcomingbirthdays')
-    const json = await response.json()
-    setUsers(json.paginatedResults)
-  }
+  const [login, setLogin] = useState(false);
 
   return (
-    <>
-      {
-        users.map((user) => {
-          return (
-            <div>{user.name}</div>
-          )
-        })
-      }
-    </>
+    <LoginProvider loginState={[login, setLogin]}>
+      {isLoggedIn() ? <UserRoutes /> : <LoginRoutes />}
+    </LoginProvider>
   );
 }
 
