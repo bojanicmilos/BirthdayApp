@@ -8,11 +8,13 @@ const UsersWithUpcomingBirthdays = () => {
 
     const [users, setUsers] = useState([])
     const [numOfPages, setNumOfPages] = useState(0)
+    const [currentPage, setCurrentPage] = useState(1)
 
     const getUsersWithFutureBirthdays = async (pageNumber = 1) => {
         const response = await fetch(`${url}/api/users/upcomingbirthdays?page=${pageNumber}`)
         const json = await response.json()
         setNumOfPages(json.numOfPages)
+        setCurrentPage(pageNumber)
         setUsers(json.paginatedResults)
     }
 
@@ -48,6 +50,7 @@ const UsersWithUpcomingBirthdays = () => {
             <Pagination
                 searchPaginatedData={getUsersWithFutureBirthdays}
                 numOfPages={numOfPages}
+                currentPage={currentPage}
             />
         </div>
     )

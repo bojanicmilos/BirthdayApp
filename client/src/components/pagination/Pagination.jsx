@@ -1,8 +1,7 @@
 import React from 'react'
 import PaginationBTrap from 'react-bootstrap/Pagination'
-import { useState } from 'react'
 
-const Pagination = ({ numOfPages, searchPaginatedData, currentPage, setCurrentPage }) => {
+const Pagination = ({ numOfPages, searchPaginatedData, currentPage }) => {
     const pageNumbers = []
 
     for (let i = 1; i <= numOfPages; i++) {

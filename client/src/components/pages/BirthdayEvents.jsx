@@ -83,7 +83,6 @@ const BirthdayEvents = () => {
                 searchPaginatedData={selectFilterRef.current?.value === 'all' ? getAllBirthdayEvents : getCurrentBirthdayEvents}
                 numOfPages={numOfPages}
                 currentPage={currentPage}
-                setCurrentPage={setCurrentPage}
             />
         </div>
     )
