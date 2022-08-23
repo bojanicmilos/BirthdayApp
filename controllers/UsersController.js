@@ -37,6 +37,8 @@ exports.getAllUsersWithUpcomingBirthdays = async (req, res) => {
 
     User.find().then(results => {
         results = results.filter(user => moment(user.birthDate).set(`year`, moment().year()) >= getCurrentDate() && user.name !== global.userName)
+        results.sort((a, b) => moment(a.birthDate).set('year', moment().year()) - moment(b.birthDate).set('year', moment().year()))
+
         const paginatedResults = results.slice((page - 1) * limit, page * limit)
         return res.status(200).json({ paginatedResults, totalFound: results.length, numOfPages: Math.ceil(results.length / limit) })
     })

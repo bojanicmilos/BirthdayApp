@@ -14,7 +14,7 @@ exports.addBirthdayEvent = async (req, res) => {
     try {
         eventCreator = await User.findOne({ name: global.userName }).exec()
     }
-    catch(err) {
+    catch (err) {
         return res.status(400).send('Wrong username format for event creator!')
     }
 
@@ -41,7 +41,7 @@ exports.addBirthdayEvent = async (req, res) => {
         return res.status(400).send('Birthday of a person is not in the future !')
     }
 
-    let existingFutureEventsForPerson = await BirthdayEvent.find({ birthdayPerson: req.body.birthdayPerson, eventDate: { $gte: getCurrentDate()}})
+    let existingFutureEventsForPerson = await BirthdayEvent.find({ birthdayPerson: req.body.birthdayPerson, eventDate: { $gte: getCurrentDate() } })
 
     if (existingFutureEventsForPerson.length > 0) {
         return res.status(400).send('Person already got upcomming event created !')
@@ -61,7 +61,7 @@ exports.addBirthdayEvent = async (req, res) => {
 
         return res.status(201).send(result)
     }
-    catch(err) {
+    catch (err) {
         res.status(400).send('Wrong event data provided !')
     }
 }
@@ -69,21 +69,23 @@ exports.addBirthdayEvent = async (req, res) => {
 exports.getCurrentEvents = async (req, res) => {
     const { page, limit } = giveProperPageAndLimit(req.query.page, req.query.limit);
 
-    const currentEvents =  await BirthdayEvent.find({eventDate: { $gte: getCurrentDate()}}).populate('birthdayPerson')
+    const currentEvents = await BirthdayEvent.find({ eventDate: { $gte: getCurrentDate() } }).populate('birthdayPerson').populate('eventCreator')
     const currentEventsWithoutLoggedUser = currentEvents.filter(event => event.birthdayPerson.name !== global.userName)
+    currentEventsWithoutLoggedUser.sort((a, b) => moment(a.eventDate).set('year', moment().year()) - moment(b.eventDate).set('year', moment().year()))
     const paginatedResults = currentEventsWithoutLoggedUser.slice((page - 1) * limit, page * limit)
-    return res.status(200).json({paginatedResults, totalFound: currentEventsWithoutLoggedUser.length})
+    return res.status(200).json({ paginatedResults, totalFound: currentEventsWithoutLoggedUser.length, numOfPages: Math.ceil(currentEventsWithoutLoggedUser.length / limit) })
 }
 
 exports.getAllEvents = async (req, res) => {
     const { page, limit } = giveProperPageAndLimit(req.query.page, req.query.limit);
 
-    BirthdayEvent.find().populate('birthdayPerson')
-                 .then(events => {
-                    const eventsWithoutLoggedUser = events.filter(event => event.birthdayPerson.name !== global.userName)
-                    const paginatedResults = eventsWithoutLoggedUser.slice((page - 1) * limit, page * limit)
-                    res.status(200).json({paginatedResults, totalFound: eventsWithoutLoggedUser.length})
-                 })
+    BirthdayEvent.find().populate('birthdayPerson').populate('eventCreator')
+        .then(events => {
+            const eventsWithoutLoggedUser = events.filter(event => event.birthdayPerson.name !== global.userName)
+            eventsWithoutLoggedUser.sort((a, b) => moment(a.eventDate).set('year', moment().year()) - moment(b.eventDate).set('year', moment().year()))
+            const paginatedResults = eventsWithoutLoggedUser.slice((page - 1) * limit, page * limit)
+            res.status(200).json({ paginatedResults, totalFound: eventsWithoutLoggedUser.length, numOfPages: Math.ceil(eventsWithoutLoggedUser.length / limit) })
+        })
 }
 
 exports.addParticipant = async (req, res) => {
@@ -92,14 +94,14 @@ exports.addParticipant = async (req, res) => {
     try {
         birthdayEvent = await BirthdayEvent.findById(req.body.birthdayEventId).populate('participants')
     }
-    catch(err) {
+    catch (err) {
         return res.status(400).send('Wrong birthday event ID format !')
     }
-    
+
     try {
         user = await User.findOne({ name: global.userName }).exec()
     }
-    catch(err) {
+    catch (err) {
         return res.status(400).send('Wrong username format !')
     }
 
@@ -114,7 +116,7 @@ exports.addParticipant = async (req, res) => {
     if (!user) {
         return res.status(400).send('User not found !')
     }
-   
+
     if (!birthdayEvent) {
         return res.status(400).send('Event not found !')
     }
@@ -122,7 +124,7 @@ exports.addParticipant = async (req, res) => {
     if (user._id.toString() === birthdayEvent.birthdayPerson.toString()) {
         return res.status(400).send('You cant pay for your birthday !')
     }
-    
+
     if (birthdayEvent.isBoughtPresent) {
         return res.status(400).send('Present is already bought for this birthday event !')
     }
@@ -160,16 +162,16 @@ exports.buyPresent = async (req, res) => {
     let birthdayEvent;
 
     try {
-         birthdayEvent = await BirthdayEvent.findById(birthdayEventId)
-                                           .populate('eventCreator')
-                                           .populate('birthdayPerson');
+        birthdayEvent = await BirthdayEvent.findById(birthdayEventId)
+            .populate('eventCreator')
+            .populate('birthdayPerson');
     }
-    catch(err) {
+    catch (err) {
         return res.status(400).send('Invalid birthday event ID format !')
     }
-    
+
     if (!birthdayEvent) {
-        return res.status(400).send('Birthday event not found !') 
+        return res.status(400).send('Birthday event not found !')
     }
 
     if (birthdayEvent.eventCreator.name !== global.userName) {
@@ -187,13 +189,13 @@ exports.buyPresent = async (req, res) => {
     const strWishListIDs = birthdayEvent.birthdayPerson.wishList.map(wish => wish.toString())
 
     if (!strWishListIDs.includes(presentToBuyId?.toString())) {
-        
+
         if (!req.body.itemName) {
             return res.status(400).send('You must provide item name if item is not chosen from the wish list !')
         }
-        
+
         const item = await Item.findOne({ name: req.body.itemName.toLowerCase() }).exec()
-        
+
         if (!item) {
             return res.status(400).send('Item not found by name !')
         }
@@ -215,6 +217,6 @@ exports.buyPresent = async (req, res) => {
     birthdayEvent.isBoughtPresent = true
 
     const result = await Promise.all([present.save(), birthdayEvent.save()]);
-    
+
     return res.status(200).json(result[0])
 }
