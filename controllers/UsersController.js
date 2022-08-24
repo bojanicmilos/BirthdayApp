@@ -136,6 +136,26 @@ exports.addItemToWishList = async (req, res) => {
     }
 
     user.save().then(result => {
-        return res.status(200).json(result)
+        return res.status(200).json(item)
     })
+}
+
+exports.deleteItemFromWishList = async (req, res) => {
+    const user = await User.findOne({ name: global.userName }).populate('wishList')
+
+    if (!user) {
+        return res.status(404).send('User not found')
+    }
+
+    const foundItem = user.wishList.find(item => item._id.toString() === req.params.itemId)
+
+    if (!foundItem) {
+        return res.status(404).send('User does not have that item in his WishList')
+    }
+
+    user.wishList = user.wishList.filter(item => item._id.toString() !== foundItem._id.toString())
+
+    await user.save()
+
+    return res.status(200).json(foundItem)
 }

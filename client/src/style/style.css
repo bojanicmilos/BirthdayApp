@@ -55,13 +55,24 @@ label {
 .flex-container-wishlist {
     display: flex;
     flex-direction: row;
-    justify-content: space-evenly;
+    justify-content: left;
     gap: 10vw;
+    margin-top: 20px;
+    margin-left: 20px;
 }
 
 .item-grid {
     display: grid;
     grid-template-columns: auto auto auto auto;
     grid-gap: 20px;
-    /* border: 1px solid black; */
+}
+
+.plus-button:hover {
+    transition: all 0.25s linear;
+    opacity: 0.5;
+}
+
+.x-button:hover {
+    transition: all 0.25s linear;
+    opacity: 0.5;
 }

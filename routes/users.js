@@ -15,5 +15,6 @@ router.get('/logout', usersController.logout)
 router.get('/upcomingbirthdays', usersController.getAllUsersWithUpcomingBirthdays)
 router.patch('/additemtowishlist/:itemId', usersController.addItemToWishList)
 router.get('/:username', usersController.getUserByUsername)
+router.delete('/itemfromwishlist/:itemId', usersController.deleteItemFromWishList)
 
 module.exports = router;

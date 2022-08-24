@@ -2,6 +2,7 @@ import React from "react";
 import { useState, useContext } from "react";
 import { url } from "../../apiInfo/Url";
 import { Context } from "../utils/LoginProvider";
+import { NotificationManager } from "react-notifications";
 
 const Login = () => {
     const [username, setUsername] = useState('')
@@ -43,7 +44,7 @@ const Login = () => {
         try {
             const response = await fetch(`${url}/api/users/login?userName=${username}`);
             if (!response.ok) {
-                console.log('WRONG REQUEST')
+                NotificationManager.error('Wrong username !')
             } else {
                 const json = await response.json();
                 localStorage.setItem("username", json.name);
