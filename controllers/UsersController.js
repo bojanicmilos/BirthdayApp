@@ -45,7 +45,7 @@ exports.getUserByUsername = async (req, res) => {
 exports.getAllUsersWithUpcomingBirthdays = async (req, res) => {
     const { page, limit } = giveProperPageAndLimit(req.query.page, req.query.limit);
 
-    User.find().then(results => {
+    User.find().populate('wishList').then(results => {
         results = results.filter(user => moment(user.birthDate).set(`year`, moment().year()) >= getCurrentDate() && user.name !== global.userName)
         results.sort((a, b) => moment(a.birthDate).set('year', moment().year()) - moment(b.birthDate).set('year', moment().year()))
 

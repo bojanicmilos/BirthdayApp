@@ -14,15 +14,15 @@ const UsersWithUpcomingBirthdays = () => {
     const [show, setShow] = useState(false);
 
     const [notes, setNotes] = useState('')
-    const [userId, setUserId] = useState('')
+    const [user, setUser] = useState({})
 
     const handleShowModal = (user) => {
-        setUserId(user._id)
+        setUser(user)
         setShow(true);
     }
 
     const handleCloseModal = () => {
-        setUserId('')
+        setUser({})
         setNotes('')
         setShow(false)
     };
@@ -38,7 +38,7 @@ const UsersWithUpcomingBirthdays = () => {
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({ birthdayPerson: userId, notes: notes })
+            body: JSON.stringify({ birthdayPerson: user._id, notes: notes })
         }
 
         const response = await fetch(`${url}/api/birthdayevents/add`, options)
@@ -106,7 +106,22 @@ const UsersWithUpcomingBirthdays = () => {
                     <Modal.Title>Start birthday event</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <Form.Label htmlFor={formInputId}>Notes</Form.Label>
+                    <p>User wishlist {!user.wishList?.length ? 'is empty.' : ':'}</p>
+                    <div className='item-grid-modal'>
+                        {user.wishList?.map(item => {
+                            return (
+                                <div key={item._id}>
+                                    <img
+                                        style={{ width: "5vw", height: "10vh", borderRadius: '5px' }}
+                                        src={item.urlLink}
+                                        alt="no"
+                                    />
+                                    <span style={{ display: 'block' }}><b>{item.name?.length > 10 ? item.name.slice(0, 9) + '...' : item.name}</b></span>
+                                </div>
+                            )
+                        })}
+                    </div>
+                    <Form.Label style={{ marginTop: '25px' }} htmlFor={formInputId}>Notes</Form.Label>
                     <Form.Control
                         type="text"
                         id={formInputId}

@@ -67,6 +67,12 @@ label {
     grid-gap: 20px;
 }
 
+.item-grid-modal {
+    display: grid;
+    grid-template-columns: auto auto auto auto;
+    grid-row-gap: 20px;
+}
+
 .plus-button:hover {
     transition: all 0.25s linear;
     opacity: 0.5;
