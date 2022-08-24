@@ -52,7 +52,7 @@ exports.addBirthdayEvent = async (req, res) => {
             birthdayPerson: req.body.birthdayPerson,
             eventCreator: eventCreator._id.toString(),
             eventDate: moment(birthdayPerson.birthDate).set('year', moment().year()),
-            notes: `Birthday for ${birthdayPerson.name}`,
+            notes: req.body.notes,
             isBoughtPresent: false,
             totalMoneyAmount: 0
         })
