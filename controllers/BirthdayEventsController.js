@@ -70,7 +70,7 @@ exports.getCurrentEvents = async (req, res) => {
     const { page, limit } = giveProperPageAndLimit(req.query.page, req.query.limit);
 
     const currentEvents = await BirthdayEvent.find({ eventDate: { $gte: getCurrentDate() } }).populate('birthdayPerson').populate('eventCreator')
-    const currentEventsWithoutLoggedUser = currentEvents.filter(event => event.birthdayPerson.name !== global.userName)
+    const currentEventsWithoutLoggedUser = currentEvents.filter(event => event.birthdayPerson?.name !== global.userName)
     currentEventsWithoutLoggedUser.sort((a, b) => moment(a.eventDate).set('year', moment().year()) - moment(b.eventDate).set('year', moment().year()))
     const paginatedResults = currentEventsWithoutLoggedUser.slice((page - 1) * limit, page * limit)
     return res.status(200).json({ paginatedResults, totalFound: currentEventsWithoutLoggedUser.length, numOfPages: Math.ceil(currentEventsWithoutLoggedUser.length / limit) })
@@ -81,7 +81,7 @@ exports.getAllEvents = async (req, res) => {
 
     BirthdayEvent.find().populate('birthdayPerson').populate('eventCreator')
         .then(events => {
-            const eventsWithoutLoggedUser = events.filter(event => event.birthdayPerson.name !== global.userName)
+            const eventsWithoutLoggedUser = events.filter(event => event.birthdayPerson?.name !== global.userName)
             eventsWithoutLoggedUser.sort((a, b) => moment(a.eventDate).set('year', moment().year()) - moment(b.eventDate).set('year', moment().year()))
             const paginatedResults = eventsWithoutLoggedUser.slice((page - 1) * limit, page * limit)
             res.status(200).json({ paginatedResults, totalFound: eventsWithoutLoggedUser.length, numOfPages: Math.ceil(eventsWithoutLoggedUser.length / limit) })

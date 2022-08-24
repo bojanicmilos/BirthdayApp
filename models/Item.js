@@ -11,6 +11,10 @@ const itemSchema = new Schema({
     urlLink: {
         type: String,
         required: false
+    },
+    price: {
+        type: Number,
+        required: false
     }
 })
 

@@ -32,6 +32,16 @@ exports.logout = async (req, res) => {
     return res.status(200).send('Logout')
 }
 
+exports.getUserByUsername = async (req, res) => {
+
+    const foundUser = await User.findOne({ name: req.params.username }).populate('wishList')
+
+    if (!foundUser) {
+        return res.status(404).send('User not found')
+    }
+    return res.status(200).json(foundUser)
+}
+
 exports.getAllUsersWithUpcomingBirthdays = async (req, res) => {
     const { page, limit } = giveProperPageAndLimit(req.query.page, req.query.limit);
 

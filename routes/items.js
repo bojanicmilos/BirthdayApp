@@ -6,11 +6,12 @@ const validateRequestSchema = require('../middleware/validateRequestSchema')
 const router = express.Router()
 
 router.post('/add',
-            body('name').isString().isLength({ min: 2 }),
-            body('urlLink').optional().isString(),
-            validateRequestSchema,
-            itemsController.addItem)
+    body('name').isString().isLength({ min: 2 }),
+    body('urlLink').optional().isString(),
+    validateRequestSchema,
+    itemsController.addItem)
 
 router.delete('/delete/:itemId', itemsController.deleteItem)
+router.get('/', itemsController.getAllItems)
 
 module.exports = router;

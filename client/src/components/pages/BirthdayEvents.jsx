@@ -37,8 +37,8 @@ const BirthdayEvents = () => {
         return allBirthdayEvents.map(event => {
             return (
                 <tr key={event._id}>
-                    <td>{event.birthdayPerson.name}</td>
-                    <td>{event.eventCreator.name}</td>
+                    <td>{event.birthdayPerson?.name}</td>
+                    <td>{event.eventCreator?.name}</td>
                     <td>{moment(event.eventDate).format('LL')}</td>
                     <td>{moment(event.eventDate) < getCurrentDate() ? 'No' : 'Yes'}</td>
                     <td>
