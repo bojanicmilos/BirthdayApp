@@ -69,7 +69,7 @@ exports.addBirthdayEvent = async (req, res) => {
 exports.getCurrentEvents = async (req, res) => {
     const { page, limit } = giveProperPageAndLimit(req.query.page, req.query.limit);
 
-    const currentEvents = await BirthdayEvent.find({ eventDate: { $gte: getCurrentDate() } }).populate({ path: 'birthdayPerson', populate: { path: 'wishList' } }).populate('eventCreator')
+    const currentEvents = await BirthdayEvent.find({ eventDate: { $gte: getCurrentDate() } }).populate({ path: 'birthdayPerson', populate: { path: 'wishList' } }).populate('eventCreator').populate({ path: 'participants', populate: { path: 'userId' } })
     const currentEventsWithoutLoggedUser = currentEvents.filter(event => event.birthdayPerson?.name !== global.userName)
     currentEventsWithoutLoggedUser.sort((a, b) => moment(a.eventDate).set('year', moment().year()) - moment(b.eventDate).set('year', moment().year()))
     const paginatedResults = currentEventsWithoutLoggedUser.slice((page - 1) * limit, page * limit)
@@ -79,7 +79,7 @@ exports.getCurrentEvents = async (req, res) => {
 exports.getAllEvents = async (req, res) => {
     const { page, limit } = giveProperPageAndLimit(req.query.page, req.query.limit);
 
-    BirthdayEvent.find().populate({ path: 'birthdayPerson', populate: { path: 'wishList' } }).populate('eventCreator')
+    BirthdayEvent.find().populate({ path: 'birthdayPerson', populate: { path: 'wishList' } }).populate('eventCreator').populate({ path: 'participants', populate: { path: 'userId' } })
         .then(events => {
             const eventsWithoutLoggedUser = events.filter(event => event.birthdayPerson?.name !== global.userName)
             eventsWithoutLoggedUser.sort((a, b) => moment(a.eventDate).set('year', moment().year()) - moment(b.eventDate).set('year', moment().year()))
@@ -186,34 +186,51 @@ exports.buyPresent = async (req, res) => {
         return res.status(400).send('Present is already bought for this event !')
     }
 
-    const strWishListIDs = birthdayEvent.birthdayPerson.wishList.map(wish => wish.toString())
+    // const strWishListIDs = birthdayEvent.birthdayPerson.wishList.map(wish => wish.toString())
 
-    if (!strWishListIDs.includes(presentToBuyId?.toString())) {
+    // if (!strWishListIDs.includes(presentToBuyId?.toString())) {
 
-        if (!req.body.itemName) {
-            return res.status(400).send('You must provide item name if item is not chosen from the wish list !')
-        }
+    //     if (!req.body.itemName) {
+    //         return res.status(400).send('You must provide item name if item is not chosen from the wish list !')
+    //     }
 
-        const item = await Item.findOne({ name: req.body.itemName.toLowerCase() }).exec()
+    //     const item = await Item.findOne({ name: req.body.itemName.toLowerCase() }).exec()
 
-        if (!item) {
-            return res.status(400).send('Item not found by name !')
-        }
-        const present = new Present({
-            birthdayEventId: birthdayEventId,
-            presentBought: item._id
-        })
-        birthdayEvent.isBoughtPresent = true
+    //     if (!item) {
+    //         return res.status(400).send('Item not found by name !')
+    //     }
+    //     const present = new Present({
+    //         birthdayEventId: birthdayEventId,
+    //         presentBought: item._id
+    //     })
+    //     birthdayEvent.isBoughtPresent = true
 
-        const result = await Promise.all([present.save(), birthdayEvent.save()])
+    //     const result = await Promise.all([present.save(), birthdayEvent.save()])
 
-        return res.status(200).json(result[0])
+    //     return res.status(200).json(result[0])
+    // }
+
+    let item;
+    try {
+        item = await Item.findById(presentToBuyId)
+    }
+    catch (err) {
+        return res.status(400).send('Wrong item ID format')
+    }
+
+    if (!item) {
+        return res.status(400).send('Item not found !')
+    }
+
+    if (item.price > birthdayEvent.totalMoneyAmount) {
+        return res.status(400).send('You dont have enough money to buy a present !')
     }
 
     const present = new Present({
         birthdayEventId: birthdayEventId,
         presentBought: presentToBuyId
     })
+
     birthdayEvent.isBoughtPresent = true
 
     const result = await Promise.all([present.save(), birthdayEvent.save()]);

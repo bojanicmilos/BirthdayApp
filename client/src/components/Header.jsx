@@ -9,6 +9,7 @@ const Header = () => {
     const [login, setLogin] = useContext(Context);
     const logout = () => {
         localStorage.removeItem("username");
+        localStorage.removeItem('id')
         setLogin(!login);
     };
 

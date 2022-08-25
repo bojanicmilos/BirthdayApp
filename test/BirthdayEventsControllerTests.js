@@ -165,7 +165,7 @@ describe('BirthdayEventsController', function () {
 
     describe('BirthdayEventsController - getCurrentEvents', function () {
         it('returns list of current events', function (done) {
-            const stub = sinon.stub(BirthdayEvent, 'find').returns({ populate: sinon.stub().returns({ populate: sinon.stub().returns([{ birthdayPerson: { name: 'random name' } }]) }) })
+            const stub = sinon.stub(BirthdayEvent, 'find').returns({ populate: sinon.stub().returns({ populate: sinon.stub().returns({ populate: sinon.stub().returns([{ birthdayPerson: { name: 'random name' } }]) }) }) })
 
             BirthdayEventsController.getCurrentEvents(req, res).then(result => {
                 stub.restore()
@@ -177,7 +177,7 @@ describe('BirthdayEventsController', function () {
 
     describe('BirthdayEventsController - getAllEvents', function () {
         it('returns list of all events', function (done) {
-            const stub = sinon.stub(BirthdayEvent, 'find').returns({ populate: sinon.stub().returns({ populate: sinon.stub().returns(Promise.resolve([{ birthdayPerson: { name: 'name' } }])) }) })
+            const stub = sinon.stub(BirthdayEvent, 'find').returns({ populate: sinon.stub().returns({ populate: sinon.stub().returns({ populate: sinon.stub().returns(Promise.resolve([{ birthdayPerson: { name: 'name' } }])) }) }) })
             BirthdayEventsController.getAllEvents(req, res).then(result => {
                 stub.restore()
                 expect(res.statusCode).to.be.equal(200)
@@ -386,39 +386,46 @@ describe('BirthdayEventsController', function () {
             }).catch(done)
         })
 
-        it('returns bad request because item name is not provided and item is not chosen from the wish list', function (done) {
-            req.body.presentToBuyId = 15
-            const stub = sinon.stub(BirthdayEvent, 'findById').returns({ populate: function () { return ({ populate: function () { return ({ birthdayPerson: { wishList: [] }, isBoughtPresent: false, totalMoneyAmount: 100, eventCreator: { name: undefined } }) } }) } })
-            BirthdayEventsController.buyPresent(req, res).then(results => {
-                stub.restore()
-                expect(res.statusCode).to.be.equal(400)
-                expect(res.message).to.be.equal('You must provide item name if item is not chosen from the wish list !')
-                done()
-            }).catch(done)
-        })
-
-        it('returns bad request when item name is provided and item is not found by name', function (done) {
-            req.body.presentToBuyId = 15
-            req.body.itemName = 'item name'
-            const stub = sinon.stub(BirthdayEvent, 'findById').returns({ populate: function () { return ({ populate: function () { return ({ save: function () { return Promise.resolve({}) }, birthdayPerson: { wishList: [] }, isBoughtPresent: false, totalMoneyAmount: 100, eventCreator: { name: undefined } }) } }) } })
-            const stub2 = sinon.stub(Item, 'findOne').returns({ exec: function () { return Promise.resolve(null) } })
-
+        it('returns bad request because item ID format is bad', function (done) {
+            const stub = sinon.stub(BirthdayEvent, 'findById').returns({ populate: function () { return ({ populate: function () { return ({ isBoughtPresent: false, totalMoneyAmount: 100, eventCreator: { name: undefined } }) } }) } })
+            const stub2 = sinon.stub(Item, 'findById').throws()
             BirthdayEventsController.buyPresent(req, res).then(results => {
                 stub.restore()
                 stub2.restore()
                 expect(res.statusCode).to.be.equal(400)
-                expect(res.message).to.be.equal('Item not found by name !')
+                expect(res.message).to.be.equal('Wrong item ID format')
                 done()
             }).catch(done)
         })
 
-        it('returns ok when item is not chosen from the wish list', function (done) {
-            req.body.presentToBuyId = 15
-            req.body.itemName = 'item name'
-            const stub = sinon.stub(BirthdayEvent, 'findById').returns({ populate: function () { return ({ populate: function () { return ({ save: function () { return Promise.resolve({}) }, birthdayPerson: { wishList: [] }, isBoughtPresent: false, totalMoneyAmount: 100, eventCreator: { name: undefined } }) } }) } })
-            const stub2 = sinon.stub(Item, 'findOne').returns({ exec: function () { return Promise.resolve({}) } })
-            const stub3 = sinon.stub(Present.prototype, 'save').returns({})
+        it('returns bad request because item is not found', function (done) {
+            const stub = sinon.stub(BirthdayEvent, 'findById').returns({ populate: function () { return ({ populate: function () { return ({ isBoughtPresent: false, totalMoneyAmount: 100, eventCreator: { name: undefined } }) } }) } })
+            const stub2 = sinon.stub(Item, 'findById').returns(null)
+            BirthdayEventsController.buyPresent(req, res).then(results => {
+                stub.restore()
+                stub2.restore()
+                expect(res.statusCode).to.be.equal(400)
+                expect(res.message).to.be.equal('Item not found !')
+                done()
+            }).catch(done)
+        })
 
+        it('returns bad request because there is no enough money for present to be bought', function (done) {
+            const stub = sinon.stub(BirthdayEvent, 'findById').returns({ populate: function () { return ({ populate: function () { return ({ isBoughtPresent: false, totalMoneyAmount: 100, eventCreator: { name: undefined } }) } }) } })
+            const stub2 = sinon.stub(Item, 'findById').returns({ price: 150 })
+            BirthdayEventsController.buyPresent(req, res).then(results => {
+                stub.restore()
+                stub2.restore()
+                expect(res.statusCode).to.be.equal(400)
+                expect(res.message).to.be.equal('You dont have enough money to buy a present !')
+                done()
+            }).catch(done)
+        })
+
+        it('returns ok with bought present', function (done) {
+            const stub = sinon.stub(BirthdayEvent, 'findById').returns({ populate: function () { return ({ populate: function () { return ({ save: function () { return Promise.resolve({}) }, isBoughtPresent: false, totalMoneyAmount: 100, eventCreator: { name: undefined } }) } }) } })
+            const stub2 = sinon.stub(Item, 'findById').returns({ price: 90 })
+            const stub3 = sinon.stub(Present.prototype, 'save').returns(Promise.resolve({}))
             BirthdayEventsController.buyPresent(req, res).then(results => {
                 stub.restore()
                 stub2.restore()
@@ -427,23 +434,5 @@ describe('BirthdayEventsController', function () {
                 done()
             }).catch(done)
         })
-
-        it('returns ok when item is chosen from the wish list', function (done) {
-            req.body.presentToBuyId = 15
-            req.body.itemName = 'item name'
-            const stub = sinon.stub(BirthdayEvent, 'findById').returns({ populate: function () { return ({ populate: function () { return ({ save: function () { return Promise.resolve({}) }, birthdayPerson: { wishList: [15] }, isBoughtPresent: false, totalMoneyAmount: 100, eventCreator: { name: undefined } }) } }) } })
-            const stub2 = sinon.stub(Present.prototype, 'save').returns({})
-
-            BirthdayEventsController.buyPresent(req, res).then(results => {
-                stub.restore()
-                stub2.restore()
-                expect(res.statusCode).to.be.equal(200)
-                done()
-            }).catch(done)
-        })
-
-
-
-
     })
 })

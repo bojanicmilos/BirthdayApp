@@ -48,6 +48,7 @@ const Login = () => {
             } else {
                 const json = await response.json();
                 localStorage.setItem("username", json.name);
+                localStorage.setItem('id', json._id)
                 setLogin(!login);
             }
         } catch (error) {

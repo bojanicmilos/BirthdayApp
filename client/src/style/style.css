@@ -69,7 +69,13 @@ label {
 
 .item-grid-modal {
     display: grid;
-    grid-template-columns: auto auto auto auto;
+    grid-template-columns: 25% 25% 25% 25%;
+    grid-row-gap: 20px;
+}
+
+.item-grid-modal-big {
+    display: grid;
+    grid-template-columns: repeat(10, 10%);
     grid-row-gap: 20px;
 }
 
@@ -81,4 +87,8 @@ label {
 .x-button:hover {
     transition: all 0.25s linear;
     opacity: 0.5;
+}
+
+.modal-90w {
+    min-width: 90%;
 }
