@@ -28,6 +28,9 @@ const Header = () => {
                 <Nav.Link as={Link} to="/mywishlist">
                     My WishList
                 </Nav.Link>
+                <Nav.Link as={Link} to="/items">
+                    Items
+                </Nav.Link>
                 <Nav.Link onClick={logout}>Logout</Nav.Link>
             </Nav>
         </Navbar>

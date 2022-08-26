@@ -8,6 +8,7 @@ import DefaultLayout from '../layouts/DefaultLayout'
 import BirthdayEvents from '../pages/BirthdayEvents'
 import MyWishList from '../pages/MyWishList'
 import UsersWithUpcomingBirthdays from '../pages/UsersWithUpcomingBirthdays'
+import Items from '../pages/Items'
 
 const UserRoutes = () => {
     return (
@@ -16,6 +17,7 @@ const UserRoutes = () => {
                 <Route path='/users' element={<UsersWithUpcomingBirthdays />} />
                 <Route path='/birthdayevents' element={<BirthdayEvents />} />
                 <Route path='/mywishlist' element={<MyWishList />} />
+                <Route path='/items' element={<Items />} />
                 <Route path="/*" element={<Navigate replace to="/users" />} />
             </Route>
         </Routes>

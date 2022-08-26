@@ -8,6 +8,7 @@ const router = express.Router()
 router.post('/add',
     body('name').isString().isLength({ min: 2 }),
     body('urlLink').optional().isString(),
+    body('price').isNumeric(),
     validateRequestSchema,
     itemsController.addItem)
 

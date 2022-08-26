@@ -99,8 +99,8 @@ const BirthdayEvents = () => {
             return
         }
 
-        if (messageAndAmount.amount < 5) {
-            NotificationManager.warning('Amount must be at least 5$')
+        if (messageAndAmount.amount < 1) {
+            NotificationManager.warning('Amount must be at least 1$')
             return
         }
 
@@ -232,7 +232,7 @@ const BirthdayEvents = () => {
                     <div className='item-grid-modal-big'>
                         {birthdayEvent.birthdayPerson?.wishList?.map((item, index) => {
                             return (
-                                <div onClick={() => selectPresentFromWishList(index, item)} key={item._id}>
+                                <div className='single-item' onClick={() => selectPresentFromWishList(index, item)} key={item._id}>
                                     <img
                                         style={{ width: "7vw", height: "14vh", borderRadius: '5px', border: index === selectedImgIndexFromWishList ? '3px solid blue' : 'none' }}
                                         src={item.urlLink}
@@ -248,7 +248,7 @@ const BirthdayEvents = () => {
                     <div className='item-grid-modal-big'>
                         {items.filter(({ name: name1 }) => !birthdayEvent?.birthdayPerson?.wishList?.some(({ name: name2 }) => name2 === name1)).map((item, index) => {
                             return (
-                                <div onClick={() => selectPresentFromOtherItems(index, item)} key={item._id}>
+                                <div className='single-item' onClick={() => selectPresentFromOtherItems(index, item)} key={item._id}>
                                     <img
                                         style={{ width: "7vw", height: "14vh", borderRadius: '5px', border: index === selectedImgIndexFromOtherItems ? '3px solid blue' : 'none' }}
                                         src={item.urlLink}
@@ -286,7 +286,7 @@ const BirthdayEvents = () => {
                     <Button variant="secondary" onClick={handleCloseModal}>
                         Close
                     </Button>
-                    <Button variant="primary" onClick={submitMessageAndAmount}>
+                    <Button disabled={birthdayEvent.isBoughtPresent} variant="primary" onClick={submitMessageAndAmount}>
                         Add amount
                     </Button>
                     {localStorage.getItem('username') === birthdayEvent.eventCreator?.name &&

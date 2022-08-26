@@ -9,7 +9,7 @@ router.post('/add', birthdayEventsController.addBirthdayEvent)
 router.get('/allcurrent', birthdayEventsController.getCurrentEvents)
 router.get('/', birthdayEventsController.getAllEvents)
 router.post('/addparticipant',
-    body('amount').isFloat({ min: 5 }),
+    body('amount').isFloat({ min: 1 }),
     body('message').isString().isLength({ min: 3 }),
     body('birthdayEventId').exists({ checkFalsy: true }),
     validateRequestSchema,
