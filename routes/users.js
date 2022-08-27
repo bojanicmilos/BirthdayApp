@@ -6,7 +6,7 @@ const validateRequestSchema = require('../middleware/validateRequestSchema')
 const router = express.Router()
 
 router.post('/',
-    body('name').isString().isLength({ min: 4 }),
+    body('name').isString().isLength({ min: 3 }),
     body('wishList').isArray(),
     validateRequestSchema,
     usersController.addUser)
