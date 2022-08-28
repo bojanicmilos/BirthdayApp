@@ -142,7 +142,7 @@ const Items = () => {
                                 id={idPrice}
                                 className="form-control mt-1"
                                 type='number'
-                                placeholder="Enter url link"
+                                placeholder="Enter price"
                                 value={price}
                                 onChange={(e) => { setPrice(e.target.value) }}
                             />

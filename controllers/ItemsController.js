@@ -1,5 +1,7 @@
 const Item = require("../models/Item")
 const capitalizeFirstLetter = require('../helpers/capitalizeFirstLetter')
+const User = require("../models/User")
+const { default: mongoose } = require("mongoose")
 
 exports.addItem = async (req, res) => {
     if (!req.body.name) {
@@ -36,7 +38,17 @@ exports.deleteItem = async (req, res) => {
         return res.status(404).send('Item not found')
     }
 
-    return res.status(200).send('Item deleted')
+    const usersWithDeletedItem = await User.find({ wishList: mongoose.Types.ObjectId(itemId) })
+
+    const newUsers = usersWithDeletedItem.map(async (user) => {
+        user.wishList = user.wishList.filter(item => item._id.toString() !== itemId)
+        await user.save()
+        return user
+    })
+
+    await Promise.all([...newUsers])
+
+    return res.status(200).send('Item deleted !')
 }
 
 exports.getAllItems = async (req, res) => {
