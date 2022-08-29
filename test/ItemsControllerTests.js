@@ -98,6 +98,17 @@ describe('Items Controller', function () {
             }).catch(done)
         })
     })
+
+    describe('itemsController - getAllItems', function () {
+        it('returns ok with list of items', function (done) {
+            const stub = sinon.stub(Item, 'find').returns([])
+            ItemsController.getAllItems(req, res).then((result) => {
+                stub.restore()
+                expect(res.statusCode).to.be.equal(200)
+                done()
+            }).catch(done)
+        })
+    })
 })
 
 

@@ -250,5 +250,26 @@ describe('UsersController', function () {
         })
     })
 
+    describe('UsersController - getUserByUsername', function () {
+        it('returns not found because user is not found', function (done) {
+            const stub = sinon.stub(User, 'findOne').returns({ populate: function () { return null } })
+            UsersController.getUserByUsername(req, res).then(result => {
+                stub.restore()
+                expect(res.statusCode).to.be.equal(404)
+                expect(res.message).to.be.equal('User not found')
+                done()
+            }).catch(done)
+        })
+
+        it('returns ok with found user', function (done) {
+            const stub = sinon.stub(User, 'findOne').returns({ populate: function () { return { userInfo: 'random info' } } })
+            UsersController.getUserByUsername(req, res).then(result => {
+                stub.restore()
+                expect(res.statusCode).to.be.equal(200)
+                done()
+            }).catch(done)
+        })
+    })
+
 })
 

@@ -435,4 +435,35 @@ describe('BirthdayEventsController', function () {
             }).catch(done)
         })
     })
+
+    describe('BirthdayEventsController - getPresentByBirthdayEventId', function () {
+        it('returns bad request because birthday event ID has wrong format', function (done) {
+            const stub = sinon.stub(Present, 'findOne').throws();
+            BirthdayEventsController.getPresentByBirthdayEventId(req, res).then(result => {
+                stub.restore()
+                expect(res.statusCode).to.be.equal(400)
+                expect(res.message).to.be.equal('Wrong birthday event ID format !')
+                done()
+            }).catch(done)
+        })
+
+        it('returns not found because present is not found', function (done) {
+            const stub = sinon.stub(Present, 'findOne').returns({ populate: function () { return null } })
+            BirthdayEventsController.getPresentByBirthdayEventId(req, res).then(result => {
+                stub.restore()
+                expect(res.statusCode).to.be.equal(404)
+                expect(res.message).to.be.equal('Present not found for birthday event !')
+                done()
+            }).catch(done)
+        })
+
+        it('returns ok with found present', function (done) {
+            const stub = sinon.stub(Present, 'findOne').returns({ populate: function () { return ({}) } })
+            BirthdayEventsController.getPresentByBirthdayEventId(req, res).then(result => {
+                stub.restore()
+                expect(res.statusCode).to.be.equal(200)
+                done()
+            }).catch(done)
+        })
+    })
 })
