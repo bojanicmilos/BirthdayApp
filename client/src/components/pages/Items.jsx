@@ -35,7 +35,8 @@ const Items = () => {
         const response = await fetch(`${url}/api/items/delete/${itemId}`, options)
 
         if (!response.ok) {
-            NotificationManager.error('Error while deleting item !')
+            const text = await response.text()
+            NotificationManager.error(text)
         }
         else {
             const filtered = items.filter(({ _id }) => _id !== itemId)
