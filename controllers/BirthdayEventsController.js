@@ -235,5 +235,22 @@ exports.buyPresent = async (req, res) => {
 
     const result = await Promise.all([present.save(), birthdayEvent.save()]);
 
-    return res.status(200).json(result[0])
+    return res.status(200).json({ result: result[0], item })
+}
+
+exports.getPresentByBirthdayEventId = async (req, res) => {
+    const { birthdayEventId } = req.params
+
+    try {
+        const foundPresent = await Present.findOne({ birthdayEventId: birthdayEventId }).populate('presentBought')
+
+        if (!foundPresent) {
+            return res.status(404).send('Present not found for birthday event !')
+        }
+
+        return res.status(200).json(foundPresent)
+    }
+    catch (err) {
+        return res.status(400).send('Wrong birthday event ID format !')
+    }
 }

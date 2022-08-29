@@ -31,6 +31,8 @@ const BirthdayEvents = () => {
 
     const [presentToBuy, setPresentToBuy] = useState(null)
 
+    const [boughtPresent, setBoughtPresent] = useState({})
+
     const selectPresentFromWishList = (index, item) => {
         if (localStorage.getItem('username') === birthdayEvent?.eventCreator?.name) {
             setSelectedImgIndexFromWishList(index)
@@ -49,6 +51,9 @@ const BirthdayEvents = () => {
 
     const handleShowModal = (birthdayEvent) => {
         setBirthdayEvent(birthdayEvent)
+        if (birthdayEvent.isBoughtPresent) {
+            getPresentByBirthdayEvent(birthdayEvent._id)
+        }
         setShow(true)
     }
 
@@ -58,6 +63,7 @@ const BirthdayEvents = () => {
         setBirthdayEvent({})
         setMessageAndAmount({ message: '', amount: 0 });
         setPresentToBuy(null);
+        setBoughtPresent({});
         selectFilterRef.current?.value === 'all' ? getAllBirthdayEvents(currentPage) : getCurrentBirthdayEvents(currentPage)
         setShow(false)
     }
@@ -82,6 +88,18 @@ const BirthdayEvents = () => {
         setNumOfPages(json.numOfPages)
         setCurrentPage(pageNumber)
         setAllBirthdayEvents(json.paginatedResults)
+    }
+
+    const getPresentByBirthdayEvent = async (eventId) => {
+        const response = await fetch(`${url}/api/birthdayevents/presentforevent/${eventId}`)
+
+        if (!response.ok) {
+            NotificationManager.error('Error while fetching present !')
+        }
+        else {
+            const json = await response.json()
+            setBoughtPresent(json)
+        }
     }
 
     const submitMessageAndAmount = async () => {
@@ -145,8 +163,10 @@ const BirthdayEvents = () => {
             NotificationManager.error(text)
         }
         else {
+            const json = await response.json()
             NotificationManager.success('You have just bought a present for this event !')
             setBirthdayEvent({ ...birthdayEvent, isBoughtPresent: true })
+            setBoughtPresent({ presentBought: { ...json.item } })
         }
 
     }
@@ -223,6 +243,7 @@ const BirthdayEvents = () => {
                     <Modal.Title>Total money: {formatter.format(birthdayEvent.totalMoneyAmount)}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
+                    <p>Present {birthdayEvent.isBoughtPresent ? `${boughtPresent.presentBought?.name} is bought for this birthday event.` : 'needs to be bought for this birthday event.'}</p>
                     <p>Participants: {birthdayEvent.participants?.map((participant, i) => {
                         return (
                             <span key={participant._id}><b>{participant.userId?.name}</b>{birthdayEvent.participants?.length !== i + 1 && ','}&nbsp;</span>

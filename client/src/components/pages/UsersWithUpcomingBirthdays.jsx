@@ -50,6 +50,7 @@ const UsersWithUpcomingBirthdays = () => {
         else {
             NotificationManager.success('Birthday event started !')
             setShow(false)
+            setNotes('')
         }
     }
 

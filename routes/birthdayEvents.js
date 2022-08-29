@@ -18,5 +18,6 @@ router.post('/buypresent',
     body('itemName').optional().isString(),
     validateRequestSchema,
     birthdayEventsController.buyPresent)
+router.get('/presentforevent/:birthdayEventId', birthdayEventsController.getPresentByBirthdayEventId)
 
 module.exports = router;
