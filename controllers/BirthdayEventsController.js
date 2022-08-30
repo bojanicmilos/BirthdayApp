@@ -34,7 +34,7 @@ exports.addBirthdayEvent = async (req, res) => {
     }
 
     if (eventCreator._id.toString() === birthdayPerson._id.toString()) {
-        return res.status(400).send('You cant make event for yourself !')
+        return res.status(400).send('You cannot make event for yourself !')
     }
 
     if (!(moment(birthdayPerson.birthDate).set(`year`, moment().year()) >= getCurrentDate())) {
@@ -122,7 +122,7 @@ exports.addParticipant = async (req, res) => {
     }
 
     if (user._id.toString() === birthdayEvent.birthdayPerson.toString()) {
-        return res.status(400).send('You cant pay for your birthday !')
+        return res.status(400).send('You cannot pay for your birthday !')
     }
 
     if (birthdayEvent.isBoughtPresent) {
@@ -186,6 +186,10 @@ exports.buyPresent = async (req, res) => {
         return res.status(400).send('Present is already bought for this event !')
     }
 
+    if (birthdayEvent.eventDate < getCurrentDate()) {
+        return res.status(400).send('Birthay event is in the past !')
+    }
+
     // const strWishListIDs = birthdayEvent.birthdayPerson.wishList.map(wish => wish.toString())
 
     // if (!strWishListIDs.includes(presentToBuyId?.toString())) {
@@ -223,7 +227,7 @@ exports.buyPresent = async (req, res) => {
     }
 
     if (item.price > birthdayEvent.totalMoneyAmount) {
-        return res.status(400).send('You dont have enough money to buy a present !')
+        return res.status(400).send('You do not have enough money to buy a present !')
     }
 
     const present = new Present({

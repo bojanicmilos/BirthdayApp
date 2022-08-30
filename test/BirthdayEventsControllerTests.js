@@ -96,7 +96,7 @@ describe('BirthdayEventsController', function () {
                 stub.restore()
                 stub2.restore()
                 expect(res.statusCode).to.be.equal(400)
-                expect(res.message).to.be.equal('You cant make event for yourself !')
+                expect(res.message).to.be.equal('You cannot make event for yourself !')
                 done()
             }).catch(done)
         })
@@ -271,7 +271,7 @@ describe('BirthdayEventsController', function () {
                 stub.restore()
                 stub2.restore()
                 expect(res.statusCode).to.be.equal(400)
-                expect(res.message).to.be.equal('You cant pay for your birthday !')
+                expect(res.message).to.be.equal('You cannot pay for your birthday !')
                 done()
             }).catch(done)
         })
@@ -386,6 +386,16 @@ describe('BirthdayEventsController', function () {
             }).catch(done)
         })
 
+        it('returns bad request because birthday event is in the past', function (done) {
+            const stub = sinon.stub(BirthdayEvent, 'findById').returns({ populate: function () { return ({ populate: function () { return ({ eventDate: new Date(2021, 11, 24), isBoughtPresent: false, totalMoneyAmount: 100, eventCreator: { name: undefined } }) } }) } })
+            BirthdayEventsController.buyPresent(req, res).then(results => {
+                stub.restore()
+                expect(res.statusCode).to.be.equal(400)
+                expect(res.message).to.be.equal('Birthay event is in the past !')
+                done()
+            }).catch(done)
+        })
+
         it('returns bad request because item ID format is bad', function (done) {
             const stub = sinon.stub(BirthdayEvent, 'findById').returns({ populate: function () { return ({ populate: function () { return ({ isBoughtPresent: false, totalMoneyAmount: 100, eventCreator: { name: undefined } }) } }) } })
             const stub2 = sinon.stub(Item, 'findById').throws()
@@ -417,7 +427,7 @@ describe('BirthdayEventsController', function () {
                 stub.restore()
                 stub2.restore()
                 expect(res.statusCode).to.be.equal(400)
-                expect(res.message).to.be.equal('You dont have enough money to buy a present !')
+                expect(res.message).to.be.equal('You do not have enough money to buy a present !')
                 done()
             }).catch(done)
         })
