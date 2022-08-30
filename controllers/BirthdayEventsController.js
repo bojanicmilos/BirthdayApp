@@ -82,7 +82,7 @@ exports.getAllEvents = async (req, res) => {
     BirthdayEvent.find().populate({ path: 'birthdayPerson', populate: { path: 'wishList' } }).populate('eventCreator').populate({ path: 'participants', populate: { path: 'userId' } })
         .then(events => {
             const eventsWithoutLoggedUser = events.filter(event => event.birthdayPerson?.name !== global.userName)
-            eventsWithoutLoggedUser.sort((a, b) => moment(a.eventDate).set('year', moment().year()) - moment(b.eventDate).set('year', moment().year()))
+            eventsWithoutLoggedUser.sort((a, b) => moment(a.eventDate) - moment(b.eventDate))
             const paginatedResults = eventsWithoutLoggedUser.slice((page - 1) * limit, page * limit)
             res.status(200).json({ paginatedResults, totalFound: eventsWithoutLoggedUser.length, numOfPages: Math.ceil(eventsWithoutLoggedUser.length / limit) })
         })

@@ -75,7 +75,7 @@ const UsersWithUpcomingBirthdays = () => {
             return (
                 <tr key={user._id}>
                     <td>{user.name}</td>
-                    <td>{moment(user.birthDate).format('LL')}
+                    <td>{moment(user.birthDate).format('MMMM d')}
                         <button onClick={() => handleShowModal(user)} className='btn btn-primary' style={{ float: 'right' }}>Start Birthday Event</button>
                     </td>
                 </tr>

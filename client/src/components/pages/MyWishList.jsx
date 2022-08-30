@@ -105,7 +105,6 @@ const MyWishList = () => {
                                             src={cancelImg}
                                         />
                                         <span style={{ display: 'block' }}><b>{item.name}</b></span>
-                                        {formatter.format(item.price)}
                                     </Card.Text>
                                 );
                             })}
