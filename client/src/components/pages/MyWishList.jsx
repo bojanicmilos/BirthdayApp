@@ -6,7 +6,6 @@ import moment from 'moment'
 import cancelImg from '../../assets/cancel.png'
 import plusImg from '../../assets/plus-5-xxl.png'
 import { NotificationManager } from 'react-notifications'
-import { formatter } from '../currencyformatter/formatter'
 
 const MyWishList = () => {
     const [user, setUser] = useState({})

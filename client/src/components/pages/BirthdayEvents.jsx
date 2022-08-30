@@ -60,10 +60,10 @@ const BirthdayEvents = () => {
     const handleCloseModal = () => {
         setSelectedImgIndexFromWishList('')
         setSelectedImgIndexFromOtherItems('')
-        setBirthdayEvent({})
+        setTimeout(() => { setBirthdayEvent({}) }, 180)
         setMessageAndAmount({ message: '', amount: 0 });
         setPresentToBuy(null);
-        setBoughtPresent({});
+        setTimeout(() => { setBoughtPresent({}) }, 180)
         selectFilterRef.current?.value === 'all' ? getAllBirthdayEvents(currentPage) : getCurrentBirthdayEvents(currentPage)
         setShow(false)
     }
