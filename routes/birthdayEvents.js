@@ -19,5 +19,6 @@ router.post('/buypresent',
     validateRequestSchema,
     birthdayEventsController.buyPresent)
 router.get('/presentforevent/:birthdayEventId', birthdayEventsController.getPresentByBirthdayEventId)
+router.get('/currenteventforperson/:birthdayPersonId', birthdayEventsController.getCurrentEventForPerson)
 
 module.exports = router;

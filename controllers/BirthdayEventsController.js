@@ -258,3 +258,20 @@ exports.getPresentByBirthdayEventId = async (req, res) => {
         return res.status(400).send('Wrong birthday event ID format !')
     }
 }
+
+exports.getCurrentEventForPerson = async (req, res) => {
+    const { birthdayPersonId } = req.params
+    let currentBirthdayEvent;
+    try {
+        currentBirthdayEvent = await BirthdayEvent.findOne({ birthdayPerson: birthdayPersonId, eventDate: { $gte: getCurrentDate() } }).populate('participants').populate('eventCreator')
+    }
+    catch (err) {
+        return res.status(400).send('Birthday person ID format invalid !')
+    }
+
+    if (!currentBirthdayEvent) {
+        return res.status(400).send('Birthday event for a person not found !')
+    }
+
+    return res.status(200).json(currentBirthdayEvent)
+}
