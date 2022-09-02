@@ -476,4 +476,35 @@ describe('BirthdayEventsController', function () {
             }).catch(done)
         })
     })
+
+    describe('BirthdayEventsController - getCurrentEventForPerson', function () {
+        it('returns bad request because person ID format is invalid', function (done) {
+            const stub = sinon.stub(BirthdayEvent, 'findOne').throws()
+            BirthdayEventsController.getCurrentEventForPerson(req, res).then(result => {
+                stub.restore()
+                expect(res.statusCode).to.be.equal(400)
+                expect(res.message).to.be.equal('Birthday person ID format invalid !')
+                done()
+            }).catch(done)
+        })
+
+        it('returns not found because there is no current event for that person', function (done) {
+            const stub = sinon.stub(BirthdayEvent, 'findOne').returns({ populate: function () { return ({ populate: function () { return null } }) } })
+            BirthdayEventsController.getCurrentEventForPerson(req, res).then(result => {
+                stub.restore()
+                expect(res.statusCode).to.be.equal(404)
+                expect(res.message).to.be.equal('Birthday event for a person not found !')
+                done()
+            }).catch(done)
+        })
+
+        it('returns ok with found event for that person', function (done) {
+            const stub = sinon.stub(BirthdayEvent, 'findOne').returns({ populate: function () { return ({ populate: function () { return ({}) } }) } })
+            BirthdayEventsController.getCurrentEventForPerson(req, res).then(result => {
+                stub.restore()
+                expect(res.statusCode).to.be.equal(200)
+                done()
+            }).catch(done)
+        })
+    })
 })
