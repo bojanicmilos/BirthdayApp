@@ -263,14 +263,14 @@ exports.getCurrentEventForPerson = async (req, res) => {
     const { birthdayPersonId } = req.params
     let currentBirthdayEvent;
     try {
-        currentBirthdayEvent = await BirthdayEvent.findOne({ birthdayPerson: birthdayPersonId, eventDate: { $gte: getCurrentDate() } }).populate('participants').populate('eventCreator')
+        currentBirthdayEvent = await BirthdayEvent.findOne({ birthdayPerson: birthdayPersonId, eventDate: { $gte: getCurrentDate() } }).populate({ path: 'participants', populate: { path: 'userId' } }).populate('eventCreator')
     }
     catch (err) {
         return res.status(400).send('Birthday person ID format invalid !')
     }
 
     if (!currentBirthdayEvent) {
-        return res.status(400).send('Birthday event for a person not found !')
+        return res.status(404).send('Birthday event for a person not found !')
     }
 
     return res.status(200).json(currentBirthdayEvent)

@@ -4,10 +4,13 @@ import Nav from "react-bootstrap/Nav";
 import { Link } from "react-router-dom";
 import { Context } from "./utils/LoginProvider";
 import { useContext } from "react";
+import moment from 'moment';
+import { getCurrentDate } from './datefunctions/getCurrentDate';
 
 const Header = () => {
     const [login, setLogin] = useContext(Context);
     const logout = () => {
+        localStorage.removeItem('birthDate')
         localStorage.removeItem("username");
         localStorage.removeItem('id')
         setLogin(!login);
@@ -31,6 +34,11 @@ const Header = () => {
                 <Nav.Link as={Link} to="/items">
                     Items
                 </Nav.Link>
+                {
+                    moment(localStorage.getItem('birthDate')).set('year', moment().year()).startOf('day').isSame(getCurrentDate()) &&
+                    <Nav.Link as={Link} to="/birthdaymessages">
+                        Birthday messages
+                    </Nav.Link>}
                 <Nav.Link onClick={logout}>Logout</Nav.Link>
             </Nav>
         </Navbar>
