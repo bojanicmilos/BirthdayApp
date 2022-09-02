@@ -34,7 +34,7 @@ const BirthdayMessages = () => {
                                 <div className='birthday-messages-grid'>
                                     {birthdayEvent.participants.map((participant) => {
                                         return (
-                                            <div id="birthdayCard">
+                                            <div key={participant._id} id="birthdayCard">
                                                 <h1>{participant.userId?.name.length > 13 ? `${participant.userId?.name.slice(0, 10)}...` : participant.userId?.name}</h1>
                                                 <p>{participant.message}</p>
                                             </div>

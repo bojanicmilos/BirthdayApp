@@ -75,7 +75,7 @@ const BirthdayEvents = () => {
     const selectFilterRef = useRef(null)
 
     const getAllBirthdayEvents = async (pageNumber = 1) => {
-        const response = await fetch(`${url}/api/birthdayevents?page=${pageNumber}&limit=2`)
+        const response = await fetch(`${url}/api/birthdayevents?page=${pageNumber}`)
         const json = await response.json()
         setNumOfPages(json.numOfPages)
         setCurrentPage(pageNumber)
@@ -83,7 +83,7 @@ const BirthdayEvents = () => {
     }
 
     const getCurrentBirthdayEvents = async (pageNumber = 1) => {
-        const response = await fetch(`${url}/api/birthdayevents/allcurrent?page=${pageNumber}&limit=2`)
+        const response = await fetch(`${url}/api/birthdayevents/allcurrent?page=${pageNumber}`)
         const json = await response.json()
         setNumOfPages(json.numOfPages)
         setCurrentPage(pageNumber)
